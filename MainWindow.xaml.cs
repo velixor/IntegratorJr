@@ -1,4 +1,7 @@
-﻿using System;
+﻿using OxyPlot;
+using OxyPlot.Axes;
+using OxyPlot.Series;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +26,21 @@ namespace IntegratorJr
         public MainWindow()
         {
             InitializeComponent();
+            DrawPlot();
+        }
+
+        private void DrawPlot()
+        {
+            var model = new PlotModel();
+            model.Axes.Add(new LinearAxis()
+            {
+                Position = AxisPosition.Bottom, // означает, будет ли это ось X, или Y 
+                AxislineStyle = LineStyle.Solid, // отвечает за тип отрисовки осей (Сплошная линия)
+                PositionAtZeroCrossing = true // означает, сможем ли мы увидеть, как оси пересекаются друг с другом
+            });
+            model.Series.Add(new FunctionSeries(x => Math.Sin(x), -5, 5, 0.01, "sin(x)"));
+
+            PlotViewer.Model = model;
         }
     }
 }

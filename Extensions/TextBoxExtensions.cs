@@ -6,7 +6,9 @@ namespace IntegratorJr
     {
         public static double Number(this TextBox textBox)
         {
-            return double.Parse(textBox.Text);
+            var textWithDots = textBox.Text.Replace(',', '.');
+
+            return double.Parse(textWithDots);
         }
     }
 }

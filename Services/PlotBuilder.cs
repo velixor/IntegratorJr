@@ -1,13 +1,12 @@
-﻿using org.mariuszgromada.math.mxparser;
+﻿using System.Threading.Tasks;
+using IntegratorJr.Models;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
-using System;
-using System.Threading.Tasks;
 
-namespace IntegratorJr
+namespace IntegratorJr.Services
 {
-    class PlotBuilder
+    internal class PlotBuilder
     {
         public Task<PlotModel> BuildPlotAsync(FunctionData functionData)
         {
@@ -35,7 +34,7 @@ namespace IntegratorJr
 
         private static LinearAxis GetAxis(AxisPosition position)
         {
-            return new LinearAxis()
+            return new LinearAxis
             {
                 Position = position, // означает, будет ли это ось X, или Y 
                 AxislineStyle = LineStyle.Solid, // отвечает за тип отрисовки осей (Сплошная линия)
@@ -45,21 +44,7 @@ namespace IntegratorJr
 
         private Series GetFunctionSeries(FunctionData functionData)
         {
-            var function = ParseFunction(functionData.Function);
-
-            return new FunctionSeries(function, functionData.Left, functionData.Right, functionData.Step);
-        }
-
-        // TODO make function 
-        private Func<double, double> ParseFunction(string function)
-        {
-            return x => 
-            {
-                var arg = new Argument("x", x);
-                var e = new Expression(function, arg);
-
-                return e.calculate();
-            };
+            return new FunctionSeries(functionData.Function.Func, functionData.Left, functionData.Right, functionData.Step);
         }
     }
 }

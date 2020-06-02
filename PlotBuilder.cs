@@ -1,13 +1,20 @@
-﻿using OxyPlot;
+﻿using org.mariuszgromada.math.mxparser;
+using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
+using System.Threading.Tasks;
 
 namespace IntegratorJr
 {
     class PlotBuilder
     {
-        public PlotModel BuildPlot(FunctionData functionData)
+        public Task<PlotModel> BuildPlotAsync(FunctionData functionData)
+        {
+            return Task.Run(() => BuildPlot(functionData));
+        }
+
+        private PlotModel BuildPlot(FunctionData functionData)
         {
             var plotModel = BuildBasicPlotModel();
 
@@ -38,15 +45,21 @@ namespace IntegratorJr
 
         private Series GetFunctionSeries(FunctionData functionData)
         {
-            var function = ParseFunction();
+            var function = ParseFunction(functionData.Function);
 
             return new FunctionSeries(function, functionData.Left, functionData.Right, functionData.Step);
         }
 
         // TODO make function 
-        private Func<double, double> ParseFunction()
+        private Func<double, double> ParseFunction(string function)
         {
-            return x => Math.Sin(x);
+            return x => 
+            {
+                var arg = new Argument("x", x);
+                var e = new Expression(function, arg);
+
+                return e.calculate();
+            };
         }
     }
 }

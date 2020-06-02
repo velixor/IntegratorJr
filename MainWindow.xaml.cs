@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 
 namespace IntegratorJr
 {
@@ -15,16 +18,28 @@ namespace IntegratorJr
             _plotBuilder = new PlotBuilder();
         }
 
-        private void CalculateIntegral_BtnClick(object sender, RoutedEventArgs e)
+        private async void CalculateIntegral_BtnClick(object sender, RoutedEventArgs e)
         {
-            DrawPlot();
+            try
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+                await DrawPlot();
+            }
+            catch(Exception exception)
+            {
+                MessageBox.Show(exception.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                Mouse.OverrideCursor = Cursors.Arrow;
+            }
         }
 
-        private void DrawPlot()
+        private async Task DrawPlot()
         {
             var functionData = BuildFunctionData();
 
-            PlotViewer.Model = _plotBuilder.BuildPlot(functionData);
+            PlotViewer.Model = await _plotBuilder.BuildPlotAsync(functionData);
         }
 
         private FunctionData BuildFunctionData()

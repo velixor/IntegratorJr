@@ -8,6 +8,21 @@
         Title="MainWindow" Height="450" Width="800"
         xmlns:oxy="http://oxyplot.org/wpf">
     <Grid>
-        <oxy:PlotView x:Name="PlotViewer"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <StackPanel Margin="0,0,482,0">
+                <TextBox x:Name="tb_Function"/>
+                <TextBox x:Name="tb_Left"/>
+                <TextBox x:Name="tb_Right"/>
+                <TextBox x:Name="tb_Step"/>
+                <Button Content="Посчитать" Click="CalculateIntegral_BtnClick"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1" >
+            <oxy:PlotView x:Name="PlotViewer"/>
+        </Grid>
     </Grid>
 </Window>

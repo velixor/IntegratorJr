@@ -24,7 +24,7 @@ namespace IntegratorJr.Services
         private IEnumerable<IntegralSolution> BuildIntegralSolutions(FunctionData f)
         {
             var integralSolvers = GetIntegralSolvers();
-            
+
             return integralSolvers.Select(x => _integralSolutionBuilder.BuildIntegralSolution(x, f));
         }
 
@@ -32,7 +32,7 @@ namespace IntegratorJr.Services
         {
             var integralSolverTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
-                .Where(x => typeof(IIntegralSolver).IsAssignableFrom(x) && !x.IsInterface);
+                .Where(x => typeof(IIntegralSolver).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract);
 
             return integralSolverTypes
                 .Select(Activator.CreateInstance)

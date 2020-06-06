@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using IntegratorJr.Exceptions;
 using IntegratorJr.Models;
 using IntegratorJr.Services;
 using org.mariuszgromada.math.mxparser;
@@ -16,6 +15,7 @@ namespace IntegratorJr
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly FunctionDataValidator _functionDataValidator;
         private readonly IntegralSolver _integralSolver;
         private readonly PlotBuilder _plotBuilder;
 
@@ -25,6 +25,8 @@ namespace IntegratorJr
 
             _plotBuilder = new PlotBuilder();
             _integralSolver = new IntegralSolver();
+            _functionDataValidator = new FunctionDataValidator();
+            ;
         }
 
         private async void CalculateIntegral_BtnClick(object sender, RoutedEventArgs e)
@@ -46,9 +48,29 @@ namespace IntegratorJr
 
         private async Task DrawPlotAndCalculateIntegrals()
         {
-            var functionData = BuildFunctionData();
+            var functionData = GetValidFunctionData();
+
             await DrawPlot(functionData);
             await CalculateIntegralValues(functionData);
+        }
+
+        private FunctionData GetValidFunctionData()
+        {
+            var functionData = BuildFunctionData();
+
+            NormalizeFunctionData(functionData);
+            _functionDataValidator.Validate(functionData);
+
+            return functionData;
+        }
+
+        private void NormalizeFunctionData(FunctionData functionData)
+        {
+            if (!(functionData.Left > functionData.Right)) return;
+
+            var t = functionData.Left;
+            functionData.Left = functionData.Right;
+            functionData.Right = t;
         }
 
         private async Task CalculateIntegralValues(FunctionData function)
@@ -74,8 +96,6 @@ namespace IntegratorJr
 
         private Function ParseFunction(string function)
         {
-            ValidateAndThrow(function);
-
             double Func(double x)
             {
                 var arg = new Argument("x", x);
@@ -84,16 +104,7 @@ namespace IntegratorJr
                 return e.calculate();
             }
 
-            return new Function(Func);
-        }
-
-
-        private void ValidateAndThrow(string function)
-        {
-            var arg = new Argument("x", 0);
-            var e = new Expression(function, arg);
-
-            if (!e.checkSyntax()) throw new FunctionStringInvalidException(e.getErrorMessage());
+            return new Function(Func, function);
         }
     }
 }

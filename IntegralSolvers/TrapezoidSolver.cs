@@ -5,9 +5,9 @@ using JetBrains.Annotations;
 
 namespace IntegratorJr.IntegralSolvers
 {
-    [DisplayName("Симпсона")]
+    [DisplayName("трапеций")]
     [UsedImplicitly]
-    public class SimpsonSolver : IIntegralSolver
+    public class TrapezoidSolver : IIntegralSolver
     {
         public double SolveIntegral(FunctionData functionData)
         {

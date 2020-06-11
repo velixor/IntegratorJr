@@ -1,18 +1,18 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using IntegratorJr.Models;
 using IntegratorJr.Services;
 using org.mariuszgromada.math.mxparser;
+using OxyPlot;
 using Expression = org.mariuszgromada.math.mxparser.Expression;
 using Function = IntegratorJr.Models.Function;
 
 namespace IntegratorJr
 {
-    /// <summary>
-    ///     Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private readonly FunctionDataValidator _functionDataValidator;
@@ -26,14 +26,13 @@ namespace IntegratorJr
             _plotBuilder = new PlotBuilder();
             _integralSolver = new IntegralSolver();
             _functionDataValidator = new FunctionDataValidator();
-            ;
         }
 
         private async void CalculateIntegral_BtnClick(object sender, RoutedEventArgs e)
         {
             try
             {
-                Mouse.OverrideCursor = Cursors.Wait;
+                LoadingLabel.Opacity = 100; 
                 await DrawPlotAndCalculateIntegrals();
             }
             catch (Exception exception)
@@ -42,14 +41,14 @@ namespace IntegratorJr
             }
             finally
             {
-                Mouse.OverrideCursor = Cursors.Arrow;
+                LoadingLabel.Opacity = 0;
             }
         }
 
         private async Task DrawPlotAndCalculateIntegrals()
         {
             var functionData = GetValidFunctionData();
-
+            
             await DrawPlot(functionData);
             await CalculateIntegralValues(functionData);
         }
@@ -59,12 +58,29 @@ namespace IntegratorJr
             var functionData = BuildFunctionData();
 
             NormalizeFunctionData(functionData);
+
             _functionDataValidator.Validate(functionData);
 
             return functionData;
         }
 
         private void NormalizeFunctionData(FunctionData functionData)
+        {
+            NormalizeLimits(functionData);
+            NormalizeStep(functionData);
+            ReflectChangesInForm(functionData);
+        }
+
+
+        private void NormalizeStep(FunctionData fd)
+        {
+            var range = fd.Right - fd.Left;
+            var stepCount = (int) Math.Ceiling(range / fd.Step);
+            if (stepCount % 2 != 0) stepCount++;
+            fd.Step = range / stepCount;
+        }
+
+        private static void NormalizeLimits(FunctionData functionData)
         {
             if (!(functionData.Left > functionData.Right)) return;
 
@@ -73,9 +89,24 @@ namespace IntegratorJr
             functionData.Right = t;
         }
 
+        private void ReflectChangesInForm(FunctionData functionData)
+        {
+            tb_Left.Text = functionData.Left.ToString();
+            tb_Right.Text = functionData.Right.ToString();
+            tb_Step.Text = functionData.Step.ToString();
+        }
+
         private async Task CalculateIntegralValues(FunctionData function)
         {
-            IntegralSolutions_lv.ItemsSource = await _integralSolver.BuildIntegralSolutionsAsync(function);
+            var values = await _integralSolver.BuildIntegralSolutionsAsync(function);
+            var roundedValues = values.ToArray();
+            
+            foreach (var integralSolution in roundedValues)
+            {
+                integralSolution.Value = Math.Round(integralSolution.Value, 2);
+            }
+
+            IntegralSolutions_lv.ItemsSource = roundedValues;
         }
 
         private async Task DrawPlot(FunctionData functionData)

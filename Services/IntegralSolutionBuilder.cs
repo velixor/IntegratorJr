@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using IntegratorJr.Exceptions;
 using IntegratorJr.IntegralSolvers;
 using IntegratorJr.Models;

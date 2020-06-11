@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using IntegratorJr.Models;
 using JetBrains.Annotations;
 
@@ -11,55 +11,20 @@ namespace IntegratorJr.IntegralSolvers
     [UsedImplicitly]
     public class RectangleSolver : BaseIntegralSolver
     {
-        public override double SolveIntegral(FunctionData functionData)
+        public override double SolveIntegral(FunctionData fd)
         {
-            var (a, b, h, f) = UngroupFunctionData(functionData);
-
-            var (wholeSegments, tail) = GetWholeSegmentsAndTail(a, b, h);
-
-            var mainArea = CalcMainArea(wholeSegments, h, f);
-            var tailArea = CalcTailAreaIfExist(tail, b, f);
-
-            return mainArea + tailArea;
+            Initialize(fd);
+            return fd.Step * CalcStepMiddles(fd).Sum();
         }
 
-        private (IEnumerable<double>, double) GetWholeSegmentsAndTail(double a, double b, double h)
+        private IEnumerable<double> CalcStepMiddles(FunctionData fd)
         {
-            var segments = GetSegments(a, b, h).ToArray();
-
-            var wholeSegments = segments.Take(segments.Length - 1);
-
-            return (wholeSegments, segments.Last());
-        }
-
-        private static IEnumerable<double> GetSegments(double a, double b, double h)
-        {
-            var x = a;
-
-            while (x <= b)
+            var x = fd.Left;
+            while (x < fd.Right)
             {
-                yield return x;
-
+                yield return f(x + h / 2);
                 x += h;
             }
-        }
-
-        private static double CalcMainArea(IEnumerable<double> wholeSegments, double h, Func<double, double> f)
-        {
-            var middlesOfSegments = wholeSegments
-                .Select(x => x + h / 2);
-
-            return h * middlesOfSegments
-                .Select(f)
-                .Sum();
-        }
-
-        private double CalcTailAreaIfExist(double last, double b, Func<double, double> f)
-        {
-            if (Math.Abs(last - b) < GlobalConstants.Tolerance) return 0;
-
-            var h = b - last;
-            return f(last + h / 2) * h;
         }
     }
 }

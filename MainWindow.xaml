@@ -3,30 +3,47 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:IntegratorJr"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="MainWindow" Height="492" Width="847"
         xmlns:oxy="http://oxyplot.org/wpf">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="100" />
+            <RowDefinition Height="119" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid>
             <StackPanel Margin="0,0,482,0">
-                <TextBox x:Name="tb_Function" Text="sin(x)" />
-                <TextBox x:Name="tb_Left" Text="-5" />
-                <TextBox x:Name="tb_Right" Text="5" />
-                <TextBox x:Name="tb_Step" Text="0.01" />
-                <Button Content="Посчитать" Click="CalculateIntegral_BtnClick" />
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Функция: "/>
+                    <TextBox x:Name="tb_Function" Text="sin(x)" Width="240" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Левый предел: "/>
+                    <TextBox x:Name="tb_Left" Text="-5" Width="211"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Правый предел: "/>
+                    <TextBox x:Name="tb_Right" Text="5" Width="204" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+
+                    <Label Content="Шаг: "/>
+                    <TextBox x:Name="tb_Step" Text="0.01" Width="263" />
+                </StackPanel>
+
+                <Button Content="Посчитать" Click="CalculateIntegral_BtnClick" Width="87" />
             </StackPanel>
+            <Label x:Name="LoadingLabel" Content="Идёт вычисление..." HorizontalAlignment="Left" VerticalAlignment="Top" Margin="317,47,0,0" Opacity="0"/>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="149*" />
                 <ColumnDefinition Width="51*" />
             </Grid.ColumnDefinitions>
-            <oxy:PlotView x:Name="PlotViewer" Background="#FFBAA2A2" />
+            <oxy:PlotView x:Name="PlotViewer" Background="#FFFAF2F2" />
             <ListView x:Name="IntegralSolutions_lv" Grid.Column="1">
                 <ListView.View>
                     <GridView>
